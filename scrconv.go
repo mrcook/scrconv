@@ -11,8 +11,8 @@ import (
 )
 
 // ReadSCR reads the data from a SCR file and converts it to the image data.
-func ReadSCR(file io.Reader) (*image.Image, error) {
-	return scr.Convert(file)
+func ReadSCR(file io.Reader, scale int, withBorder bool) (*image.Image, error) {
+	return scr.Convert(file, scale, withBorder)
 }
 
 func ImageToPNG(w io.Writer, img *image.Image) error {

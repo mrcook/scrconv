@@ -8,14 +8,14 @@ import (
 )
 
 // Convert a ZX Spectrum SCR to an Image representation.
-func Convert(file io.Reader) (*image.Image, error) {
+func Convert(file io.Reader, scale int, withBorder bool) (*image.Image, error) {
 	s := scr{}
 
 	if err := s.readFileBytes(file); err != nil {
 		return nil, err
 	}
 
-	img := image.Image{}
+	img := image.New(scale, withBorder)
 
 	// process the screen in 1/3 at a time (2048 bytes) for easier conversion
 	for i := 0; i < 3; i++ {

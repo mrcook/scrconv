@@ -10,15 +10,18 @@ import (
 )
 
 var (
-	scrFilename  *string
-	outputFormat *string
-	pngFilename  *string
+	scrFilename    *string
+	outputFormat   *string
+	outputFilename string
+	scale          *int
+	withBorder     *bool
 )
 
 func init() {
 	scrFilename = flag.String("scr", "", "Input .SCR filename")
 	outputFormat = flag.String("format", "png", "Image format to output")
-	pngFilename = flag.String("out", "", "Output filename (optional)")
+	scale = flag.Int("scale", 1, "Scale factor (default: 1, max: 4)")
+	withBorder = flag.Bool("border", true, "Add a black border (default: true)")
 	v := flag.Bool("v", false, "Display version number")
 
 	flag.Parse()
@@ -35,13 +38,11 @@ func init() {
 		os.Exit(2)
 	}
 
-	if len(*pngFilename) == 0 {
-		*pngFilename = *scrFilename
-	}
+	outputFilename = *scrFilename
 
 	outputExtension := "." + *outputFormat
-	if path.Ext(*pngFilename) != outputExtension {
-		*pngFilename += outputExtension
+	if path.Ext(outputFilename) != outputExtension {
+		outputFilename += outputExtension
 	}
 }
 
@@ -53,13 +54,13 @@ func main() {
 	}
 	defer reader.Close()
 
-	img, err := scrconv.ReadSCR(reader)
+	img, err := scrconv.ReadSCR(reader, *scale, *withBorder)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ERROR reading SCR file: %w", err))
 		os.Exit(1)
 	}
 
-	writer, err := os.Create(*pngFilename)
+	writer, err := os.Create(outputFilename)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ERROR creating PNG image file: %w", err))
 		os.Exit(1)
