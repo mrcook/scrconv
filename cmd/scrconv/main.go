@@ -67,8 +67,24 @@ func main() {
 	}
 	defer writer.Close()
 
-	if err := scrconv.ImageToPNG(writer, img); err != nil {
-		fmt.Println(fmt.Errorf("ERROR convert SCR to PNG image: %w", err))
+	switch *outputFormat {
+	case "png":
+		if err := scrconv.ImageToPNG(writer, img); err != nil {
+			fmt.Println(fmt.Errorf("ERROR convert SCR to PNG image: %w", err))
+			os.Exit(1)
+		}
+	case "jpg":
+		if err := scrconv.ImageToJPG(writer, img, 100); err != nil {
+			fmt.Println(fmt.Errorf("ERROR convert SCR to JPG image: %w", err))
+			os.Exit(1)
+		}
+	case "gif":
+		if err := scrconv.ImageToGIF(writer, img); err != nil {
+			fmt.Println(fmt.Errorf("ERROR convert SCR to JPG image: %w", err))
+			os.Exit(1)
+		}
+	default:
+		fmt.Println("invalid format selected")
 		os.Exit(1)
 	}
 
