@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"image"
-	"image/png"
 	"os"
 	"path"
 
@@ -48,39 +46,30 @@ func init() {
 }
 
 func main() {
-	scr := scrconv.SCR{}
+	reader, err := os.Open(*scrFilename)
+	if err != nil {
+		fmt.Println(fmt.Errorf("ERROR opening SCR file: %w", err))
+		os.Exit(1)
+	}
+	defer reader.Close()
 
-	if err := convertSCR(&scr, *scrFilename); err != nil {
-		fmt.Println(err)
+	img, err := scrconv.ReadSCR(reader)
+	if err != nil {
+		fmt.Println(fmt.Errorf("ERROR reading SCR file: %w", err))
 		os.Exit(1)
 	}
 
-	if err := savePNG(scr.Image, *pngFilename); err != nil {
-		fmt.Printf("ERROR saving new image file: %q", err)
+	writer, err := os.Create(*pngFilename)
+	if err != nil {
+		fmt.Println(fmt.Errorf("ERROR creating PNG image file: %w", err))
+		os.Exit(1)
+	}
+	defer writer.Close()
+
+	if err := scrconv.ImageToPNG(writer, img); err != nil {
+		fmt.Println(fmt.Errorf("ERROR convert SCR to PNG image: %w", err))
 		os.Exit(1)
 	}
 
 	fmt.Println("SCR image converted successfully")
-}
-
-func convertSCR(scr *scrconv.SCR, filename string) error {
-	file, err := os.Open(filename)
-	if err != nil {
-		return fmt.Errorf("ERROR opening SCR file: %w", err)
-	}
-
-	err = scr.Convert(file)
-	if err != nil {
-		return fmt.Errorf("ERROR converting SCR: %w", err)
-	}
-
-	return nil
-}
-
-func savePNG(img image.Image, filename string) error {
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	return png.Encode(f, img)
 }

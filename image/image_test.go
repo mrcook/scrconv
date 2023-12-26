@@ -4,29 +4,28 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/mrcook/scrconv/colour"
 	"github.com/mrcook/scrconv/image"
 )
 
 func TestImage_SetAndAt(t *testing.T) {
 	img := image.Image{}
 
-	img.Set(10, 128, colour.Colour{R: 0x11, G: 0xCC, B: 0xBB, A: 0x99})
+	img.Set(10, 128, image.Colour{ATTR: 0b00100111})
 
 	t.Run("using At() with correct coordinates", func(t *testing.T) {
 		at := img.At(10, 128)
 		r, g, b, a := at.RGBA()
 
-		if r != 0x1111 {
+		if r != 0x0000 {
 			t.Errorf("expected R to be 0x1111, got: 0x%02X", r)
 		}
-		if g != 0xCCCC {
+		if g != 0xEEEE {
 			t.Errorf("expected G to be 0xCCCC, got: 0x%02X", g)
 		}
-		if b != 0xBBBB {
+		if b != 0x0000 {
 			t.Errorf("expected B to be 0xBBBB, got: 0x%02X", b)
 		}
-		if a != 0x9999 {
+		if a != 0xFFFF {
 			t.Errorf("expected A to be 0x9999, got: 0x%02X", a)
 		}
 	})
@@ -35,16 +34,16 @@ func TestImage_SetAndAt(t *testing.T) {
 		at := img.At(100, 256)
 		r, g, b, a := at.RGBA()
 
-		if r != 0 {
+		if r != 0x0000 {
 			t.Errorf("expected R to be 0, got: 0x%02X", r)
 		}
-		if g != 0 {
+		if g != 0x0000 {
 			t.Errorf("expected G to be 0, got: 0x%02X", g)
 		}
-		if b != 0 {
+		if b != 0x0000 {
 			t.Errorf("expected B to be 0, got: 0x%02X", b)
 		}
-		if a != 0 {
+		if a != 0xFFFF {
 			t.Errorf("expected A to be 0, got: 0x%02X", a)
 		}
 	})
