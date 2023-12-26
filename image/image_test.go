@@ -8,7 +8,7 @@ import (
 )
 
 func TestImage_SetAndAt(t *testing.T) {
-	img := image.Image{}
+	img := image.New(1, false)
 
 	img.Set(10, 128, image.Colour{ATTR: 0b00100111})
 
@@ -50,7 +50,7 @@ func TestImage_SetAndAt(t *testing.T) {
 }
 
 func TestImage_Bounds(t *testing.T) {
-	img := image.Image{}
+	img := image.New(1, false)
 
 	x := img.Bounds().Max.X
 	y := img.Bounds().Max.Y
@@ -64,7 +64,7 @@ func TestImage_Bounds(t *testing.T) {
 }
 
 func TestImage_ColorModel(t *testing.T) {
-	img := image.Image{}
+	img := image.New(1, false)
 
 	if img.ColorModel() != color.RGBAModel {
 		t.Fatalf("unexcpeted colour model, got %s", img.ColorModel())
