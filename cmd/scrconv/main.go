@@ -22,7 +22,8 @@ func init() {
 	flag.StringVar(&opts.ImageFormat, "format", "auto", "Image format: auto, gif, jpg, png (auto=png or gif when FLASH is detected")
 	flag.IntVar(&opts.Scale, "scale", 1, "Scale factor, max: 4, default: 1")
 	flag.BoolVar(&opts.WithBorder, "border", true, "Add a border to the image")
-	flag.IntVar(&opts.BackgroundColour, "border-colour", 0, "Border Colour, values: 0 - 15 (default 0)")
+	flag.IntVar(&opts.BorderColour, "border-colour", 0, "Border Colour, values: 0 - 15 (default 0)")
+	flag.BoolVar(&opts.AutoBorderColour, "auto-border", false, "EXPERIMENTAL: Auto Detect Border Colour")
 	v := flag.Bool("v", false, "Show version number")
 
 	flag.Parse()

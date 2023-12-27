@@ -54,6 +54,12 @@ normal/bright colours; a value between 0-15. The default colour is black.
      6 | Yellow     |  14 | Bright Yellow
      7 | White      |  15 | Bright White
 
+**EXPERIMENTAL**
+
+When setting the `auto-border` the border colour will be auto-detected based on
+the most common colour in the image. This setting overrides any value given in
+the `border-colour`.
+
 
 ## Installation
 

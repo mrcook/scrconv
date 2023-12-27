@@ -15,6 +15,10 @@ func FromSCR(file io.Reader, opts options.Options) (*Image, error) {
 		return nil, err
 	}
 
+	if opts.AutoBorderColour {
+		opts.BorderColour = s.mostCommonColour()
+	}
+
 	img := New(opts)
 
 	// process the screen in 1/3 at a time (2048 bytes) for easier conversion
@@ -117,4 +121,38 @@ func (s *scr) readFileBytes(file io.Reader) error {
 	}
 
 	return nil
+}
+
+// mostCommonColour returns a ZX Spectrum colour value (0-15) for the most
+// common ink/paper colour in the image.
+func (s *scr) mostCommonColour() int {
+	// calculate the colour counts in an image
+	var colourCount = map[byte]int{}
+	for _, attr := range s.attributes {
+		bright := attr&0b01000000 != 0
+
+		paper := (attr & 0b00111000) >> 3
+		ink := attr & 0b00000111
+
+		// if BRIGHT, add 8 to value
+		if bright {
+			paper += 8
+			ink += 8
+		}
+
+		colourCount[ink]++
+		colourCount[paper]++
+	}
+
+	// find the most common colour
+	var commonColourAttr byte
+	var commonColourCount int
+	for attr, count := range colourCount {
+		if count > commonColourCount {
+			commonColourAttr = attr
+			commonColourCount = count
+		}
+	}
+
+	return int(commonColourAttr)
 }

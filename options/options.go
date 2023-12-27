@@ -11,7 +11,8 @@ type Options struct {
 	ImageFormat      string
 	Scale            int
 	WithBorder       bool
-	BackgroundColour int
+	BorderColour     int
+	AutoBorderColour bool
 }
 
 func (o Options) OutputFilename() string {
@@ -40,7 +41,7 @@ func (o Options) Validate() error {
 	if err := o.validateScale(); err != nil {
 		validationErrors = errors.Join(validationErrors, err)
 	}
-	if err := o.validateBgColour(); err != nil {
+	if err := o.validateBorderColour(); err != nil {
 		validationErrors = errors.Join(validationErrors, err)
 	}
 
@@ -56,9 +57,9 @@ func (o Options) validateFormat() error {
 	}
 }
 
-func (o Options) validateBgColour() error {
-	if o.BackgroundColour < 0 || o.BackgroundColour > 15 {
-		return errors.New("background must be a ZX Spectrum colour value: 0 - 15")
+func (o Options) validateBorderColour() error {
+	if o.BorderColour < 0 || o.BorderColour > 15 {
+		return errors.New("border must be a ZX Spectrum colour value: 0 - 15")
 	}
 	return nil
 }

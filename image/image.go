@@ -32,7 +32,7 @@ func New(opts options.Options) Image {
 		scale:    opts.Scale,
 		bordered: opts.WithBorder,
 	}
-	img.setBackgroundColour(opts.BackgroundColour)
+	img.setBorderColour(opts.BorderColour)
 
 	// initialize the pixels with the correct dimensions (with scaling and borders)
 	for row := 0; row < img.imageHeight(); row++ {
@@ -136,7 +136,7 @@ func (img *Image) scaledHeightBorder() int {
 	return 0
 }
 
-func (img *Image) setBackgroundColour(colour int) {
+func (img *Image) setBorderColour(colour int) {
 	if colour <= 0x00 || colour > 0x0F {
 		return
 	}

@@ -9,11 +9,11 @@ import (
 
 func TestOptions_Validate(t *testing.T) {
 	opts := options.Options{
-		InFilename:       "/path/to/something.scr",
-		ImageFormat:      "png",
-		Scale:            2,
-		WithBorder:       true,
-		BackgroundColour: 3,
+		InFilename:   "/path/to/something.scr",
+		ImageFormat:  "png",
+		Scale:        2,
+		WithBorder:   true,
+		BorderColour: 3,
 	}
 	if err := opts.Validate(); err != nil {
 		t.Fatalf("unexpected validation error: %s", err)
@@ -59,24 +59,24 @@ func TestOptions_Validate(t *testing.T) {
 		}
 	})
 
-	t.Run("background colour validation", func(t *testing.T) {
+	t.Run("border colour validation", func(t *testing.T) {
 		defer func() {
-			opts.BackgroundColour = 3 // reset after use
+			opts.BorderColour = 3 // reset after use
 		}()
 
-		opts.BackgroundColour = -1
+		opts.BorderColour = -1
 		if err := opts.Validate(); err == nil {
 			t.Errorf("expect and error")
 		}
-		opts.BackgroundColour = 0
+		opts.BorderColour = 0
 		if err := opts.Validate(); err != nil {
 			t.Errorf("unexpected error, got %s", err)
 		}
-		opts.BackgroundColour = 15
+		opts.BorderColour = 15
 		if err := opts.Validate(); err != nil {
 			t.Errorf("unexpected error, got %s", err)
 		}
-		opts.BackgroundColour = 16
+		opts.BorderColour = 16
 		if err := opts.Validate(); err == nil {
 			t.Errorf("expect and error")
 		}
