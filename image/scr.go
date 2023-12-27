@@ -1,21 +1,21 @@
-package scr
+package image
 
 import (
 	"fmt"
 	"io"
 
-	"github.com/mrcook/scrconv/image"
+	"github.com/mrcook/scrconv/options"
 )
 
-// Convert a ZX Spectrum SCR to an Image representation.
-func Convert(file io.Reader, scale int, withBorder bool) (*image.Image, error) {
+// FromSCR a ZX Spectrum SCR to an Image representation.
+func FromSCR(file io.Reader, opts options.Options) (*Image, error) {
 	s := scr{}
 
 	if err := s.readFileBytes(file); err != nil {
 		return nil, err
 	}
 
-	img := image.New(scale, withBorder)
+	img := New(opts)
 
 	// process the screen in 1/3 at a time (2048 bytes) for easier conversion
 	for i := 0; i < 3; i++ {
@@ -41,7 +41,7 @@ func Convert(file io.Reader, scale int, withBorder bool) (*image.Image, error) {
 					isPixel := ((pixel << bit) & 0b10000000) > 0
 
 					xPos := x*8 + bit // convert byte position to correct pixel position
-					img.Set(xPos, yPos, image.Colour{ATTR: attr, IsPixel: isPixel})
+					img.Set(xPos, yPos, Colour{ATTR: attr, IsPixel: isPixel})
 				}
 			}
 		}

@@ -4,25 +4,26 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
 
 	"github.com/mrcook/scrconv"
+	"github.com/mrcook/scrconv/options"
 )
 
-var (
-	scrFilename    *string
-	outputFormat   *string
-	outputFilename string
-	scale          *int
-	withBorder     *bool
-)
+var opts = options.Options{}
 
 func init() {
-	scrFilename = flag.String("scr", "", "Input .SCR filename")
-	outputFormat = flag.String("format", "png", "Image format to output")
-	scale = flag.Int("scale", 1, "Scale factor (default: 1, max: 4)")
-	withBorder = flag.Bool("border", true, "Add a black border (default: true)")
-	v := flag.Bool("v", false, "Display version number")
+	flag.Usage = func() {
+		fmt.Printf("Usage of %s:\n", os.Args[0])
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	flag.StringVar(&opts.InFilename, "scr", "", "Input .SCR filename")
+	flag.StringVar(&opts.ImageFormat, "format", "png", "Image format: gif, jpg, png (default)")
+	flag.IntVar(&opts.Scale, "scale", 1, "Scale factor, max: 4, default: 1")
+	flag.BoolVar(&opts.WithBorder, "border", true, "Add a border to the image, default: true")
+	flag.IntVar(&opts.BackgroundColour, "bg-colour", 0, "Border Colour, values: 0 - 15, default: 0 (black)")
+	v := flag.Bool("v", false, "Show version number")
 
 	flag.Parse()
 
@@ -31,43 +32,37 @@ func init() {
 		os.Exit(0)
 	}
 
-	if len(*scrFilename) == 0 {
-		fmt.Println("ERROR: 'scr' filename is required!")
+	if err := opts.Validate(); err != nil {
+		fmt.Printf("ERROR invalid input\n%s", err)
+		fmt.Println()
 		fmt.Println()
 		flag.Usage()
 		os.Exit(2)
 	}
-
-	outputFilename = *scrFilename
-
-	outputExtension := "." + *outputFormat
-	if path.Ext(outputFilename) != outputExtension {
-		outputFilename += outputExtension
-	}
 }
 
 func main() {
-	reader, err := os.Open(*scrFilename)
+	reader, err := os.Open(opts.InFilename)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ERROR opening SCR file: %w", err))
 		os.Exit(1)
 	}
 	defer reader.Close()
 
-	img, err := scrconv.ReadSCR(reader, *scale, *withBorder)
+	img, err := scrconv.ConvertToImage(reader, opts)
 	if err != nil {
 		fmt.Println(fmt.Errorf("ERROR reading SCR file: %w", err))
 		os.Exit(1)
 	}
 
-	writer, err := os.Create(outputFilename)
+	writer, err := os.Create(opts.OutputFilename())
 	if err != nil {
 		fmt.Println(fmt.Errorf("ERROR creating PNG image file: %w", err))
 		os.Exit(1)
 	}
 	defer writer.Close()
 
-	switch *outputFormat {
+	switch opts.ImageFormat {
 	case "png":
 		if err := scrconv.ImageToPNG(writer, img); err != nil {
 			fmt.Println(fmt.Errorf("ERROR convert SCR to PNG image: %w", err))

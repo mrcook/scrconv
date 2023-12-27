@@ -3,53 +3,41 @@ package image
 import (
 	"image"
 	"image/color"
+
+	"github.com/mrcook/scrconv/options"
 )
 
-// Width and Height in pixels of a standard ZX Spectrum SCR image.
+// Dimension of a standard ZX Spectrum SCR image in pixels.
 const (
-	defaultWidth  = 256
-	defaultHeight = 192
-
-	// border each side = 1/8th of the image
-	// with default image size: width = 32, height = 24
-	borderRatio = 8
+	defaultWidth        = 256
+	defaultHeight       = 192
+	defaultWidthBorder  = 32 // border each side = 1/8th of the image width
+	defaultHeightBorder = 24 // border each side = 1/8th of the image height
 )
 
 // Image is a ZX Spectrum compatible image implementation, which can be used
 // with the standard Go image.Image interface: At(), Bounds(), ColorModel().
 type Image struct {
-	width, height             int
-	widthBorder, heightBorder int
-	pixels                    [][]Colour
-	scale                     int
-
-	// Setting flash output will swap the ink/paper colours.
-	enableFlashOutput bool
+	enableFlashOutput bool       // when enabled will swap the ink/paper colours
+	scale             int        // scale factor: 1-4
+	bordered          bool       // should the image include a border
+	borderColour      Colour     // if border enabled what colour? default: black
+	pixels            [][]Colour // the image pixels
 }
 
-// New return a new image using the scale value to scale the image (max x4)
-func New(scale int, withBorder bool) Image {
-	if scale <= 0 {
-		scale = 1
-	} else if scale > 4 {
-		scale = 4 // set max scale level
-	}
-
+// New returns a new image with the given options.
+func New(opts options.Options) Image {
 	img := Image{
-		width:  defaultWidth * scale,
-		height: defaultHeight * scale,
-		scale:  scale,
+		scale:    opts.Scale,
+		bordered: opts.WithBorder,
 	}
-	if withBorder {
-		img.widthBorder = img.width / borderRatio
-		img.heightBorder = img.height / borderRatio
-	}
+	img.setBackgroundColour(opts.BackgroundColour)
 
-	// initialize the pixels with the correct dimensions
+	// initialize the pixels with the correct dimensions (with scaling and borders)
 	for row := 0; row < img.imageHeight(); row++ {
 		var columns []Colour
 		for col := 0; col < img.imageWidth(); col++ {
-			columns = append(columns, Colour{})
+			columns = append(columns, img.borderColour)
 		}
 		img.pixels = append(img.pixels, columns)
 	}
@@ -57,7 +45,7 @@ func New(scale int, withBorder bool) Image {
 	return img
 }
 
-// SetFlashOutput will output an image with all FLASH colours enabled.
+// SetFlashOutput will output an image with all FLASH colours on.
 func (img *Image) SetFlashOutput(flash bool) {
 	img.enableFlashOutput = flash
 }
@@ -73,8 +61,8 @@ func (img *Image) Set(x, y int, c Colour) {
 	x *= img.scale
 
 	// add padding for the left/top borders
-	y += img.heightBorder
-	x += img.widthBorder
+	y += img.scaledHeightBorder()
+	x += img.scaledWidthBorder()
 
 	// generate the correct number of pixels for the scaling factor
 	for row := 0; row < img.scale; row++ {
@@ -116,12 +104,44 @@ func (img *Image) ColorModel() color.Model {
 	return color.RGBAModel
 }
 
-// imageWidth is the full width of the image, including the borders.
+// imageWidth is the full width of the image, including the borders, with scaling applied.
 func (img *Image) imageWidth() int {
-	return img.width + img.widthBorder*2
+	return defaultWidth*img.scale + img.scaledWidthBorder()*2
 }
 
-// imageHeight is the full height of the image, including the borders.
+// imageHeight is the full height of the image, including the borders, with scaling applied.
 func (img *Image) imageHeight() int {
-	return img.height + img.heightBorder*2
+	return defaultHeight*img.scale + img.scaledHeightBorder()*2
+}
+
+// scaledWidthBorder is border size, with scaling applied.
+func (img *Image) scaledWidthBorder() int {
+	if img.bordered {
+		return defaultWidthBorder * img.scale
+	}
+	return 0
+}
+
+// scaledHeightBorder is border size, with scaling applied.
+func (img *Image) scaledHeightBorder() int {
+	if img.bordered {
+		return defaultHeightBorder * img.scale
+	}
+	return 0
+}
+
+func (img *Image) setBackgroundColour(colour int) {
+	if colour <= 0x00 || colour > 0x0F {
+		return
+	}
+
+	var attr = uint8(colour)
+
+	// set as a BRIGHT colour
+	if attr > 0x07 {
+		attr -= 8
+		attr |= 1 << 6
+	}
+
+	img.borderColour = Colour{ATTR: attr, IsPixel: true}
 }

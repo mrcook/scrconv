@@ -7,12 +7,12 @@ import (
 	"io"
 
 	"github.com/mrcook/scrconv/image"
-	"github.com/mrcook/scrconv/scr"
+	"github.com/mrcook/scrconv/options"
 )
 
-// ReadSCR reads the data from a SCR file and converts it to the image data.
-func ReadSCR(file io.Reader, scale int, withBorder bool) (*image.Image, error) {
-	return scr.Convert(file, scale, withBorder)
+// ConvertToImage reads the data from a SCR file and converts it to the image data.
+func ConvertToImage(file io.Reader, opts options.Options) (*image.Image, error) {
+	return image.FromSCR(file, opts)
 }
 
 func ImageToPNG(w io.Writer, img *image.Image) error {
