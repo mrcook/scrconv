@@ -1,5 +1,7 @@
 package image
 
+import "image/color"
+
 // Colour represents a Spectrum pixel/attribute as an RGB colour value, and
 // implements the Go color.Color interface.
 type Colour struct {
@@ -89,4 +91,12 @@ var sinclairColourMap = map[uint8]rgb{
 	0x0D: {0x00, 0xFF, 0xFF},
 	0x0E: {0xFF, 0xFF, 0x00},
 	0x0F: {0xFF, 0xFF, 0xFF},
+}
+
+func SpectrumPalette() []color.Color {
+	var colours []color.Color
+	for _, colour := range sinclairColourMap {
+		colours = append(colours, color.RGBA{R: colour.r, G: colour.g, B: colour.b, A: 0xff})
+	}
+	return colours
 }

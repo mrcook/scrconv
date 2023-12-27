@@ -34,6 +34,13 @@ func FromSCR(file io.Reader, opts options.Options) (*Image, error) {
 				pixel := s.pixelsByteAt(x, y)
 				attr := s.attributeAt(x, y)
 
+				// if one attribute has the FLASH bit set
+				if !img.hasFlashingPixels {
+					if attr&0b10000000 != 0 {
+						img.hasFlashingPixels = true
+					}
+				}
+
 				// iterate over each pixel bit, add to image, setting its
 				// colour based on the corresponding attribute byte.
 				for bit := 0; bit < 8; bit++ {

@@ -19,7 +19,7 @@ func init() {
 	}
 
 	flag.StringVar(&opts.InFilename, "scr", "", "Input .SCR filename")
-	flag.StringVar(&opts.ImageFormat, "format", "png", "Image format: gif, jpg, png")
+	flag.StringVar(&opts.ImageFormat, "format", "auto", "Image format: auto, gif, jpg, png (auto=png or gif when FLASH is detected")
 	flag.IntVar(&opts.Scale, "scale", 1, "Scale factor, max: 4, default: 1")
 	flag.BoolVar(&opts.WithBorder, "border", true, "Add a border to the image")
 	flag.IntVar(&opts.BackgroundColour, "border-colour", 0, "Border Colour, values: 0 - 15 (default 0)")
@@ -55,6 +55,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if opts.ImageFormat == "auto" {
+		if img.HasFlashingPixels() {
+			opts.ImageFormat = "gif"
+		} else {
+			opts.ImageFormat = "png"
+		}
+	}
+
 	writer, err := os.Create(opts.OutputFilename())
 	if err != nil {
 		fmt.Println(fmt.Errorf("ERROR creating PNG image file: %w", err))
@@ -75,7 +83,7 @@ func main() {
 		}
 	case "gif":
 		if err := scrconv.ImageToGIF(writer, img); err != nil {
-			fmt.Println(fmt.Errorf("ERROR convert SCR to JPG image: %w", err))
+			fmt.Println(fmt.Errorf("ERROR convert SCR to GIF image: %w", err))
 			os.Exit(1)
 		}
 	default:

@@ -49,7 +49,7 @@ func (o Options) Validate() error {
 
 func (o Options) validateFormat() error {
 	switch o.ImageFormat {
-	case "png", "jpg", "gif":
+	case "auto", "png", "jpg", "gif":
 		return nil
 	default:
 		return errors.New("unsupported image format")

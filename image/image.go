@@ -19,6 +19,7 @@ const (
 // with the standard Go image.Image interface: At(), Bounds(), ColorModel().
 type Image struct {
 	enableFlashOutput bool       // when enabled will swap the ink/paper colours
+	hasFlashingPixels bool       // set when a pixel has the FLASH bit set
 	scale             int        // scale factor: 1-4
 	bordered          bool       // should the image include a border
 	borderColour      Colour     // if border enabled what colour? default: black
@@ -48,6 +49,11 @@ func New(opts options.Options) Image {
 // SetFlashOutput will output an image with all FLASH colours on.
 func (img *Image) SetFlashOutput(flash bool) {
 	img.enableFlashOutput = flash
+}
+
+// HasFlashingPixels returns true when the image has at least one pixel with the FLASH bit set.
+func (img *Image) HasFlashingPixels() bool {
+	return img.hasFlashingPixels
 }
 
 // Set the colour at the x/y coordinate, applying the borders and any scaling.
