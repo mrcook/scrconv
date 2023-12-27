@@ -19,10 +19,10 @@ func init() {
 	}
 
 	flag.StringVar(&opts.InFilename, "scr", "", "Input .SCR filename")
-	flag.StringVar(&opts.ImageFormat, "format", "png", "Image format: gif, jpg, png (default)")
+	flag.StringVar(&opts.ImageFormat, "format", "png", "Image format: gif, jpg, png")
 	flag.IntVar(&opts.Scale, "scale", 1, "Scale factor, max: 4, default: 1")
-	flag.BoolVar(&opts.WithBorder, "border", true, "Add a border to the image, default: true")
-	flag.IntVar(&opts.BackgroundColour, "bg-colour", 0, "Border Colour, values: 0 - 15, default: 0 (black)")
+	flag.BoolVar(&opts.WithBorder, "border", true, "Add a border to the image")
+	flag.IntVar(&opts.BackgroundColour, "border-colour", 0, "Border Colour, values: 0 - 15 (default 0)")
 	v := flag.Bool("v", false, "Show version number")
 
 	flag.Parse()

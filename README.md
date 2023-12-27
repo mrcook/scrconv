@@ -1,53 +1,73 @@
 # scrconv - ZX Spectrum SCR converter
 
-A Go language library for converting ZX Spectrum SCR files to a Go's
-`image.Image` interface, which can then be used to export to standard image
-formats like PNG and JPG.
+A CLI program for converting ZX Spectrum SCR files to normal image formats
+such as PNG, GIF, and JPG.
 
-A command-line utility is also available for converting directly from a SCR
-to PNG image.
+## Usage
 
+Once the program is installed (see below) a SCR file can be converted with
+the following command:
 
-## Usage as a library
+    ./scrconv -scr="/path/to/game.scr"
 
-Open a `.scr` file, instantiate the `SCR` struct then call the `Convert` function:
+By default `format=png`, `scale=1` and `border=true`, so a 320x240 PNG image is
+created in the same directory as the SCR file, with the filename `game.png`.
 
-    file, err := os.Open(filename)
+    Usage of ./scrconv:
+      -scr string
+            Input .SCR filename
+      -format string
+            Image format: gif, jpg, png (default "png")
+      -scale int
+            Scale factor, max: 4 (default 1)
+      -border
+            Add a border to the image (default true)
+      -border-colour int
+            Border Colour, values: 0 - 15 (default: 0)
+      -v	Show version number
 
-    scr := scrconv.SCR{}
-	err = scr.Convert(file)
+### Scale
 
-Once converted, `scr.Image` will be an object that responds to the Go language
-`image.Image` interface, which can be used to export to a PNG image:
+The scaling generates an image in one of the following resolutions:
 
-	f, err := os.Create(filename)
+    scale |   size   | + border
+    ------+----------+----------
+      1   |  256x192 |  320x240 (default)
+      2   |  512x384 |  640x480
+      3   |  768x576 |  960x720
+      4   | 1024x768 | 1280x960
 
-	err = png.Encode(f, img)
+### Border Colour
 
+When the `border` option is enabled, setting a `border-colour` will change
+the colour of the border. The value should be one of the 16 ZX Spectrum
+normal/bright colours; a value between 0-15. The default colour is black.
 
-## Usage as a command-line app
-
-Once you have compiled the program:
-
-    $ scrconv -scr="/path/to/game.scr"
-
-This command will convert the `game.scr` to a PNG image in the same directory
-with the filename `game.scr.png`.
+     # | Colour     |  #  | Colour
+    ---+------------+-----+---------------
+     0 | Black      |   8 | Black
+     1 | Blue       |   9 | Bright Blue
+     2 | Red        |  10 | Bright Red
+     3 | Magenta    |  11 | Bright Magenta
+     4 | Green      |  12 | Bright Green
+     5 | Cyan       |  13 | Bright Cyan
+     6 | Yellow     |  14 | Bright Yellow
+     7 | White      |  15 | Bright White
 
 
 ## Installation
 
-    $ go get -u -v github.com/mrcook/scrconv/...
+    go install github.com/mrcook/scrconv/cmd/scrconv@latest
 
-To install the app after manually cloning the repository:
+To install the program after manually cloning the repository:
 
-    $ cd scrconv
-    $ go install ./cmd/scrconv
+    cd scrconv
+    go install ./cmd/scrconv
 
 
 ## LICENSE
 
-Copyright (c) 2021 Michael R. Cook. All rights reserved.
+Copyright (c) 2021-2023 Michael R. Cook. All rights reserved.
 
 This work is licensed under the terms of the MIT license.
 For a copy, see <https://opensource.org/licenses/MIT>.
