@@ -24,6 +24,8 @@ created in the same directory as the SCR file, with the filename `game.png`.
             Add a border to the image (default true)
       -border-colour int
             Border Colour, values: 0 - 15 (default: 0)
+      -auto-border
+            EXPERIMENTAL: Auto Detect Border Colour
       -v	Show version number
 
 ### Scale
